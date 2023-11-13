@@ -20,6 +20,7 @@ const userSchema = new Schema({
         ref: "Movie",
         default: [],
     }]
-})
+},
+    { timestamps: true })
 
 export default userSchema

@@ -19,8 +19,10 @@ const movieSchema = new Schema({
         type: String,
         min: 5,
         max: 200,
-    }
+    },
+
     
-})
+},
+{ timestamps: true })
 
 export default movieSchema

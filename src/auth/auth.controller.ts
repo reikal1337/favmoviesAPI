@@ -8,11 +8,12 @@ export class AuthController {
 
     @Post("registracija")
     register(@Body() dto: AuthDto){
-        
+        return this.authServise.register(dto)
     }
 
     @Post("prisijungimas")
     login(@Body() dto: AuthDto){
+        return this.authServise.login(dto)
 
     }
 }
