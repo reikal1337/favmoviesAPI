@@ -1,4 +1,27 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Delete, Get, Post } from '@nestjs/common';
+import { MovieService } from './movie.service';
 
 @Controller('movie')
-export class MovieController {}
+export class MovieController {
+    constructor(private movieService: MovieService) {}
+
+    @Get()
+    getMyMovies(){
+
+    }
+
+    @Get(":id")
+    getMoviesByUserId(){
+
+    }
+
+    @Post(":id")
+    createMovie(){
+
+    }
+
+    @Delete(":id")
+    deleteMovieById(){
+        
+    }
+}
