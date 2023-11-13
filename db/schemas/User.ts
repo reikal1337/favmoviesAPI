@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-require("./Movie")
+require("./FavMovie")
 
 const userSchema = new Schema({
     username: {
@@ -17,7 +17,7 @@ const userSchema = new Schema({
     },
     favMovies: [{
         type: Schema.Types.ObjectId,
-        ref: "Movie",
+        ref: "FavMovie",
         default: [],
     }]
 },

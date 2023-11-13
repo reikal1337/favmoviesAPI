@@ -1,25 +1,96 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Query, ObjectId } from 'mongoose';
+import { CreateFavMovieDto, DeleteFavMoviesDto } from './dto';
 
 @Injectable()
 export class MovieService {
-    constructor(@InjectModel("Movie") private readonly movieModel: Model<any>,) {}
+    constructor(
+        @InjectModel("FavMovie") private readonly favMovieModel: Model<any>,
+        @InjectModel("User") private readonly userModel: Model<any>) {}
         
-        getMyMovies(){
+        async getMyFavMovies( userId: string){
     
+            const user = await this.userModel.findById({_id: userId})
+            .populate({
+                path: "favMovies",
+                select: '-createdAt -updatedAt -__v',
+                
+            }).select("-createdAt -updatedAt -__v -password")
+
+            return user.favMovies
         }
     
-        getMoviesByUserId(){
-    
+        async getFavMoviesByUserId(userId: string){
+            const user = await this.userModel.findById({_id: userId})
+            .populate({
+                path: "favMovies",
+                select: '-createdAt -updatedAt -__v',
+                
+            }).select("-createdAt -updatedAt -__v -password")
+
+            if(!user) throw new BadRequestException("Toks vartotojas neegzistoja!")
+
+            return user.favMovies
+
         }
     
-        createMovie(){
-    
-        }
-    
-        deleteMovieById(){
+        async createFavMovie(userId: string, dto: CreateFavMovieDto){
+            const newFavMovie = await this.favMovieModel.create({
+                ...dto,
+            })
+
+            if(!newFavMovie) throw new BadRequestException("Nepavyko sukurti naujo megstamiausio filmo!")
             
+            const updatedUser = await this.userModel.findByIdAndUpdate({_id: userId},
+                {
+                    $push: {favMovies: newFavMovie._id}
+                },{
+                    new: true
+                }
+                ).populate({
+                    path: "favMovies",
+                    select: '-createdAt -updatedAt -__v',
+                    
+                }).select("-createdAt -updatedAt -__v -password")
+
+                if(!updatedUser) throw new BadRequestException("Nepavyko isaugoti naujo megstamiausio filmo!")
+
+                return updatedUser.favMovies
+
+        }
+        
+
+        async deleteFavMovieById(userId: string, favMovies: string[], dto: DeleteFavMoviesDto){
+
+            const checkIfUsersFavMovies = dto.ids.every( id => favMovies.includes(id))
+            if(!checkIfUsersFavMovies) throw new BadRequestException("Tau nepriklauso sie filmai!")
+
+            const delMovies = await this.favMovieModel.deleteMany({
+                _id: {$in: dto.ids}
+            }).exec()
+            
+            if(delMovies.deletedCount === 0) throw new BadRequestException("Nepavyko istrinti megstamiausiu filmu! film del")
+
+            const updatedUser = await this.userModel.findByIdAndUpdate({_id: userId},
+                {
+                    $pull: { favMovies: {$in: dto.ids} }
+                },
+                {
+                    new: true
+                }
+                ).populate({
+                    path: "favMovies",
+                    select: '-createdAt -updatedAt -__v',
+                    
+                }).select("-createdAt -updatedAt -__v -password")
+
+
+            if(!updatedUser) throw new BadRequestException("Nepavyko istrinti megstamiausiu filmu! usr")
+
+
+            return updatedUser.favMovies
+
         }
     
 }

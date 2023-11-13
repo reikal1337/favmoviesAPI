@@ -1,29 +1,45 @@
-import { Controller, Delete, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { AuthGuard } from '@nestjs/passport';
+import { GetUser } from 'src/auth/decorator';
+import { CreateFavMovieDto, DeleteFavMoviesDto } from './dto';
+import { ObjectId } from 'mongoose';
 
-@Controller('movie')
+@Controller('movies')
 export class MovieController {
     constructor(private movieService: MovieService) {}
 
     @UseGuards(AuthGuard("simpleJWT"))
     @Get()
-    getMyMovies(){
+    getMyFavMovies(
+        @GetUser("_id") userId: string,
+        ){
+        return this.movieService.getMyFavMovies(userId)
 
     }
 
     @Get(":id")
-    getMoviesByUserId(){
+    getFavMoviesByUserId(@Param("id") userId: string){
+        return this.movieService.getFavMoviesByUserId(userId)
 
     }
 
-    @Post(":id")
-    createMovie(){
-
+    @UseGuards(AuthGuard("simpleJWT"))
+    @Post()
+    createFavMovie(
+        @GetUser("_id") userId: string,
+        @Body() dto: CreateFavMovieDto,
+        ){
+            return this.movieService.createFavMovie(userId, dto)
     }
 
-    @Delete(":id")
-    deleteMovieById(){
-
+    @UseGuards(AuthGuard("simpleJWT"))
+    @Delete()
+    deleteFavMoviesById(
+        @GetUser("_id") userId: string,
+        @GetUser("favMovies") favMovies: string[],
+        @Body() dto: DeleteFavMoviesDto,
+    ){
+        return this.movieService.deleteFavMovieById(userId, favMovies, dto)
     }
 }

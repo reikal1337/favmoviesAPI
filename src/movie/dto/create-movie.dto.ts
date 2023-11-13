@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsOptional, IsString, Length } from "class-validator"
 
-export class CreateMovieDto {
+export class CreateFavMovieDto {
 
     @IsString({message: "Filmo pavadinimas turi buti string!"})
     @IsNotEmpty({message: "Filmo pavadinimas negali buti tuscias!"})
@@ -14,7 +14,7 @@ export class CreateMovieDto {
     @Length(5, 200, {
         message: "Paveksliuko url turi buti 5-200 ilgumo!"
     })
-    imageUrl: string
+    imageURL: string
 
     @IsOptional()
     @IsString({message: "IMDb url turi buti string!"})

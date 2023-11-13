@@ -1,6 +1,6 @@
 import { Schema } from "mongoose";
 
-const movieSchema = new Schema({
+const favMovieSchema = new Schema({
     title: {
         type: String,
         required: true,
@@ -29,4 +29,4 @@ const movieSchema = new Schema({
 },
 { timestamps: true })
 
-export default movieSchema
+export default favMovieSchema

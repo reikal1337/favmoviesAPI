@@ -2,14 +2,19 @@ import { Module } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { MovieController } from './movie.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import movieSchema from 'db/schemas/Movie';
+import favMovieSchema from 'db/schemas/FavMovie';
+import userSchema from 'db/schemas/User';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       {
-        name: "Movie",
-        schema: movieSchema,
+        name: "FavMovie",
+        schema: favMovieSchema,
+      },
+      {
+        name: "User",
+        schema: userSchema,
       },
     ]),
   ],
