@@ -7,3 +7,5 @@ type DbUser = {
     createdAt?: string,
     __v?: number,
 }
+
+type SafeUser = Omit<DbUser, "password"> 
