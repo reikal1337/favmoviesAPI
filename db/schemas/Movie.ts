@@ -9,16 +9,20 @@ const movieSchema = new Schema({
     },
     imageURL: {
         type: String,
+        minLength: 5,
+        maxLength: 200,
         required: true,
     },
-    imbURL: {
+    imdbURL: {
         type: String,
+        minLength: 5,
+        maxLength: 200,
 
     },
     description: {
         type: String,
-        min: 5,
-        max: 200,
+        min: 1,
+        max: 250,
     },
 
     
