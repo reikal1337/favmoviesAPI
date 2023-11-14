@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, ServiceUnavailableException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { EditUserDto } from './dto';
@@ -26,5 +26,17 @@ export class UserService {
         }).select(" -password")
 
         return userUpdated;
+    }
+
+    async getAllUsers(){
+        try {
+            const allUsers = await this.userModel.find().select("_id username")
+            
+            return allUsers
+
+        } catch (error) {
+            console.error(error)
+            throw new ServiceUnavailableException("Nepavyko gauti vartotoju!")
+        }
     }
 }

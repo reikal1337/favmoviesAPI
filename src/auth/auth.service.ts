@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { AuthDto } from './dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose'
@@ -14,18 +14,16 @@ export class AuthService {
 
     async register(dto: AuthDto){
         try {
+            if(dto.username === dto.password) throw new BadRequestException("Slaptazodis negali buti toks pat kaip vartotojas!")
+
             const hashedPsw = await argon.hash(dto.password)
             const newUser = await this.userModel.create({
                 username: dto.username,
                 password: hashedPsw,
             })
-            const userObj = newUser.toObject()
-            delete userObj.password
-            delete userObj.updatedAt
-            delete userObj.createdAt
-            delete userObj.__v
+        
 
-            return userObj
+            return { username: newUser.username }
 
         } catch (error) {
             if(error.code === 11000){
@@ -58,7 +56,7 @@ export class AuthService {
             secret: process.env.JWT_SECRET
         })
 
-        return { access_token: token }
+        return { access_token: token , username: user.username}
 
 
     }
