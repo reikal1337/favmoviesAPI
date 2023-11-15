@@ -17,8 +17,6 @@ export class MovieService {
                 select: '-createdAt -updatedAt -__v',
                 
             }).select("-createdAt -updatedAt -__v -password")
-            console.log("geting my movies: ", user.favMovies.length)
-
             return user.favMovies
         }
     
