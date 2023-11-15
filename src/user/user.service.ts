@@ -31,7 +31,6 @@ export class UserService {
     async getAllUsers(){
         try {
             const allUsers = await this.userModel.find().select("_id username")
-            
             return allUsers
 
         } catch (error) {

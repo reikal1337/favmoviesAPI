@@ -17,6 +17,7 @@ export class MovieService {
                 select: '-createdAt -updatedAt -__v',
                 
             }).select("-createdAt -updatedAt -__v -password")
+            console.log("geting my movies: ", user.favMovies.length)
 
             return user.favMovies
         }
@@ -56,7 +57,7 @@ export class MovieService {
 
                 if(!updatedUser) throw new BadRequestException("Nepavyko isaugoti naujo megstamiausio filmo!")
 
-                return updatedUser.favMovies
+                return { favMovies: updatedUser.favMovies}
 
         }
         

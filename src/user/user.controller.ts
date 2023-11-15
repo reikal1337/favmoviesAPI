@@ -20,6 +20,13 @@ export class UserController {
     }
 
     @UseGuards(AuthGuard("simpleJWT"))
+    @Get("me")
+    getMyUsername(@GetUser("username") username: string){
+        return username
+
+    }
+
+    @UseGuards(AuthGuard("simpleJWT"))
     @Patch()
     changeUserPassword(
     @GetUser("_id") userId: string,
