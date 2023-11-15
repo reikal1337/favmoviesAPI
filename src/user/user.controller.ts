@@ -22,7 +22,7 @@ export class UserController {
     @UseGuards(AuthGuard("simpleJWT"))
     @Get("me")
     getMyUsername(@GetUser("username") username: string){
-        return username
+        return { username: username }
 
     }
 

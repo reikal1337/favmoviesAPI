@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Query, ObjectId } from 'mongoose';
 import { CreateFavMovieDto, DeleteFavMoviesDto } from './dto';
@@ -32,7 +32,7 @@ export class MovieService {
 
             if(!user) throw new BadRequestException("Toks vartotojas neegzistoja!")
 
-            return user.favMovies
+            return {username: user.username, movies: user.favMovies}
 
         }
     
@@ -62,16 +62,17 @@ export class MovieService {
         }
         
 
-        async deleteFavMovieById(userId: string, favMovies: string[], dto: DeleteFavMoviesDto){
-
-            const checkIfUsersFavMovies = dto.ids.every( id => favMovies.includes(id))
-            if(!checkIfUsersFavMovies) throw new BadRequestException("Tau nepriklauso sie filmai!")
+        async deleteFavMoviesById(userId: string, favMovies: string[], dto: DeleteFavMoviesDto){
+            const usersFavMovies = favMovies.map(id => id.toString())
+            
+            const checkIfUsersFavMovies = dto.ids.every( id => usersFavMovies.includes(id))
+            if(!checkIfUsersFavMovies) throw new  ForbiddenException("Tau nepriklauso sie filmai!")
 
             const delMovies = await this.favMovieModel.deleteMany({
                 _id: {$in: dto.ids}
             }).exec()
             
-            if(delMovies.deletedCount === 0) throw new BadRequestException("Nepavyko istrinti megstamiausiu filmu! film del")
+            if(delMovies.deletedCount === 0) throw new BadRequestException("Nepavyko istrinti megstamiausiu filmu!")
 
             const updatedUser = await this.userModel.findByIdAndUpdate({_id: userId},
                 {
@@ -87,10 +88,10 @@ export class MovieService {
                 }).select("-createdAt -updatedAt -__v -password")
 
 
-            if(!updatedUser) throw new BadRequestException("Nepavyko istrinti megstamiausiu filmu! usr")
+            if(!updatedUser) throw new BadRequestException("Nepavyko istrinti megstamiausiu filmu!")
 
 
-            return updatedUser.favMovies
+            return { favMovies: updatedUser.favMovies}
 
         }
     

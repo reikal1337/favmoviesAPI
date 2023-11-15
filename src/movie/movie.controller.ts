@@ -40,6 +40,6 @@ export class MovieController {
         @GetUser("favMovies") favMovies: string[],
         @Body() dto: DeleteFavMoviesDto,
     ){
-        return this.movieService.deleteFavMovieById(userId, favMovies, dto)
+        return this.movieService.deleteFavMoviesById(userId, favMovies, dto)
     }
 }
