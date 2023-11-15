@@ -64,7 +64,6 @@ export class MovieService {
 
         async deleteFavMoviesById(userId: string, favMovies: string[], dto: DeleteFavMoviesDto){
             const usersFavMovies = favMovies.map(id => id.toString())
-            
             const checkIfUsersFavMovies = dto.ids.every( id => usersFavMovies.includes(id))
             if(!checkIfUsersFavMovies) throw new  ForbiddenException("Tau nepriklauso sie filmai!")
 

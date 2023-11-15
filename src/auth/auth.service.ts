@@ -52,7 +52,7 @@ export class AuthService {
         }
 
         const token = await this.jwt.signAsync(tokenPayload, {
-            expiresIn: process.env.DEVELOPMENT === "true" ? "1h" : "20m",
+            expiresIn: "20m",
             secret: process.env.JWT_SECRET
         })
 

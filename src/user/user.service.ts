@@ -11,7 +11,7 @@ export class UserService {
     async changeUserPassword(
         userId: string,
         dto: EditUserDto){
-        const user: DbUser = await this.userModel.findById({_id: userId})
+        const user: DbUser = await this.userModel.findById({ _id: userId })
         const validPsw = await argon.verify(user.password, dto.oldPassword)
         if(!validPsw) throw new ForbiddenException("Blogas senas slaptazodis!")
 
@@ -25,7 +25,7 @@ export class UserService {
             new: true
         }).select(" -password")
 
-        return userUpdated;
+        return { user: userUpdated};
     }
 
     async getAllUsers(){
