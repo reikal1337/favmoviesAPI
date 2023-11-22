@@ -38,22 +38,29 @@ export class UserService {
         const page = parsedPage <= pageMax && parsedPage > 0 ? parsedPage : 1
         const usersToSkip = (page - 1 ) * limit
 
-        let sortingOrder = {};
+        let sortingOrderQuery = {};
         if(dto.ob === "Az"){
-            sortingOrder = {
+            sortingOrderQuery = {
                 username: 1
             }
         } else if (dto.ob === "Za"){
-            sortingOrder = {
+            sortingOrderQuery = {
                 username: -1
             }
         }
 
-        const allUsers = await this.userModel.find()
+        let searchQuery = {}
+        if(dto.paieska != undefined){
+            searchQuery = {
+                username: { $regex: new RegExp(dto.paieska, "i")}
+            }
+        }
+
+        const allUsers = await this.userModel.find(searchQuery)
         .select("_id username")
         .limit(limit)
         .skip(usersToSkip)
-        .sort(sortingOrder)
+        .sort(sortingOrderQuery)
 
         return { users: allUsers, page, pageMax }
     }
