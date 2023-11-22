@@ -8,9 +8,9 @@ export class MovieService {
     constructor(
         @InjectModel("FavMovie") private readonly favMovieModel: Model<any>,
         @InjectModel("User") private readonly userModel: Model<any>) {}
+
         
         async getMyFavMovies( userId: string){
-    
             const user = await this.userModel.findById({_id: userId})
             .populate({
                 path: "favMovies",

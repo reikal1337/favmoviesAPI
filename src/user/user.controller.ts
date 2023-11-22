@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/auth/decorator';
 import { EditUserDto } from './dto';
@@ -15,8 +15,8 @@ export class UserController {
     }
 
     @Get("all")
-    getAllUsers(){
-        return this.userService.getAllUsers()
+    getAllUsers(@Query("p") qPpage: string){
+        return this.userService.getAllUsers(qPpage)
     }
 
     @UseGuards(AuthGuard("simpleJWT"))

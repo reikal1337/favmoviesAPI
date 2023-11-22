@@ -10,8 +10,8 @@ export class AuthDto {
 
     @IsString({message: "Slaptazodis turi buti string!"})
     @IsNotEmpty({message: "Slaptazodis negali buti tuscias!"})
-    @Length(4,25, {
-        message: "Slaptazodis turi buti 6-25 ilgumo!"
+    @Length(6, 100, {
+        message: "Slaptazodis turi buti 6-100 ilgumo!"
     })
     password: string
 }

@@ -1,8 +1,9 @@
-import { ForbiddenException, Injectable, ServiceUnavailableException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, ServiceUnavailableException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { EditUserDto } from './dto';
 import * as argon from "argon2"
+import { parse } from 'path';
 
 @Injectable()
 export class UserService {
@@ -28,14 +29,17 @@ export class UserService {
         return { user: userUpdated};
     }
 
-    async getAllUsers(){
-        try {
-            const allUsers = await this.userModel.find().select("_id username")
-            return allUsers
+    async getAllUsers(qPage: string){
+        const limit = 5;
+        const userNumber = await this.userModel.estimatedDocumentCount()
+        const pageMax = Math.ceil(userNumber / limit);
+        const parsedPage = parseInt(qPage)
+        const page = parsedPage <= pageMax && parsedPage > 0 ? parsedPage : 1
+        const usersToSkip = (page - 1 ) * limit
 
-        } catch (error) {
-            console.error(error)
-            throw new ServiceUnavailableException("Nepavyko gauti vartotoju!")
-        }
+        const allUsers = await this.userModel.find().select("_id username").limit(limit).skip(usersToSkip)
+
+        return { users: allUsers, page, pageMax }
     }
+
 }
