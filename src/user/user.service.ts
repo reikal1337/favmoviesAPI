@@ -1,7 +1,7 @@
 import { BadRequestException, ForbiddenException, Injectable, ServiceUnavailableException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { EditUserDto } from './dto';
+import { EditUserDto, UsersQuery } from './dto';
 import * as argon from "argon2"
 import { parse } from 'path';
 
@@ -29,15 +29,31 @@ export class UserService {
         return { user: userUpdated};
     }
 
-    async getAllUsers(qPage: string){
+    async getAllUsers(dto: UsersQuery){
+
         const limit = 5;
         const userNumber = await this.userModel.estimatedDocumentCount()
         const pageMax = Math.ceil(userNumber / limit);
-        const parsedPage = parseInt(qPage)
+        const parsedPage = parseInt(dto.p)
         const page = parsedPage <= pageMax && parsedPage > 0 ? parsedPage : 1
         const usersToSkip = (page - 1 ) * limit
 
-        const allUsers = await this.userModel.find().select("_id username").limit(limit).skip(usersToSkip)
+        let sortingOrder = {};
+        if(dto.ob === "Az"){
+            sortingOrder = {
+                username: 1
+            }
+        } else if (dto.ob === "Za"){
+            sortingOrder = {
+                username: -1
+            }
+        }
+
+        const allUsers = await this.userModel.find()
+        .select("_id username")
+        .limit(limit)
+        .skip(usersToSkip)
+        .sort(sortingOrder)
 
         return { users: allUsers, page, pageMax }
     }
