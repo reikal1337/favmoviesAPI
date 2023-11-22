@@ -30,13 +30,21 @@ export class UserService {
     }
 
     async getAllUsers(dto: UsersQuery){
-
+        let searchQuery = {}
+        if(dto.paieska != undefined){
+            searchQuery = {
+                username: { $regex: new RegExp(dto.paieska, "i")}
+            }
+        }
+        
         const limit = 5;
-        const userNumber = await this.userModel.estimatedDocumentCount()
+        const userNumber = await this.userModel.countDocuments(searchQuery)
         const pageMax = Math.ceil(userNumber / limit);
         const parsedPage = parseInt(dto.p)
         const page = parsedPage <= pageMax && parsedPage > 0 ? parsedPage : 1
         const usersToSkip = (page - 1 ) * limit
+
+        console.log("user nr:", userNumber)
 
         let sortingOrderQuery = {};
         if(dto.ob === "Az"){
@@ -46,13 +54,6 @@ export class UserService {
         } else if (dto.ob === "Za"){
             sortingOrderQuery = {
                 username: -1
-            }
-        }
-
-        let searchQuery = {}
-        if(dto.paieska != undefined){
-            searchQuery = {
-                username: { $regex: new RegExp(dto.paieska, "i")}
             }
         }
 
