@@ -1,7 +1,7 @@
-import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/auth/decorator';
-import { EditUserDto } from './dto';
+import { EditUserDto, UsersQuery } from './dto';
 import { UserService } from './user.service';
 
 @Controller('user')
@@ -15,8 +15,10 @@ export class UserController {
     }
 
     @Get("all")
-    getAllUsers(){
-        return this.userService.getAllUsers()
+    getAllUsers(
+        @Query() dto: UsersQuery,
+        ){
+        return this.userService.getAllUsers(dto)
     }
 
     @UseGuards(AuthGuard("simpleJWT"))

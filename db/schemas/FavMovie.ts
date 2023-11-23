@@ -27,6 +27,6 @@ const favMovieSchema = new Schema({
 
     
 },
-{ timestamps: true })
+{ timestamps: true})
 
 export default favMovieSchema

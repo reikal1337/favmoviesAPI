@@ -1,8 +1,9 @@
-import { ForbiddenException, Injectable, ServiceUnavailableException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, ServiceUnavailableException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { EditUserDto } from './dto';
+import { EditUserDto, UsersQuery } from './dto';
 import * as argon from "argon2"
+import { parse } from 'path';
 
 @Injectable()
 export class UserService {
@@ -28,14 +29,39 @@ export class UserService {
         return { user: userUpdated};
     }
 
-    async getAllUsers(){
-        try {
-            const allUsers = await this.userModel.find().select("_id username")
-            return allUsers
-
-        } catch (error) {
-            console.error(error)
-            throw new ServiceUnavailableException("Nepavyko gauti vartotoju!")
+    async getAllUsers(dto: UsersQuery){
+        let searchQuery = {}
+        if(dto.paieska != undefined){
+            searchQuery = {
+                username: { $regex: new RegExp(dto.paieska, "i")}
+            }
         }
+
+        const limit = 4;
+        const userNumber = await this.userModel.countDocuments(searchQuery)
+        const pageMax = Math.ceil(userNumber / limit);
+        const parsedPage = parseInt(dto.p)
+        const page = parsedPage <= pageMax && parsedPage > 0 ? parsedPage : 1
+        const usersToSkip = (page - 1 ) * limit
+
+        let sortingOrderQuery = {};
+        if(dto.ob === "Az"){
+            sortingOrderQuery = {
+                username: 1
+            }
+        } else if (dto.ob === "Za"){
+            sortingOrderQuery = {
+                username: -1
+            }
+        }
+
+        const allUsers = await this.userModel.find(searchQuery)
+        .select("_id username")
+        .limit(limit)
+        .skip(usersToSkip)
+        .sort(sortingOrderQuery)
+
+        return { users: allUsers, page, pageMax, userCount: userNumber }
     }
+
 }
