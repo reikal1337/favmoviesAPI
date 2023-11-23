@@ -36,15 +36,13 @@ export class UserService {
                 username: { $regex: new RegExp(dto.paieska, "i")}
             }
         }
-        
-        const limit = 5;
+
+        const limit = 4;
         const userNumber = await this.userModel.countDocuments(searchQuery)
         const pageMax = Math.ceil(userNumber / limit);
         const parsedPage = parseInt(dto.p)
         const page = parsedPage <= pageMax && parsedPage > 0 ? parsedPage : 1
         const usersToSkip = (page - 1 ) * limit
-
-        console.log("user nr:", userNumber)
 
         let sortingOrderQuery = {};
         if(dto.ob === "Az"){
@@ -63,7 +61,7 @@ export class UserService {
         .skip(usersToSkip)
         .sort(sortingOrderQuery)
 
-        return { users: allUsers, page, pageMax }
+        return { users: allUsers, page, pageMax, userCount: userNumber }
     }
 
 }

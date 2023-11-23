@@ -13,26 +13,22 @@ export class AuthService {
         ) {}
 
     async register(dto: AuthDto){
-        try {
-            if(dto.username === dto.password) throw new BadRequestException("Slaptazodis negali buti toks pat kaip vartotojas!")
-
-            const hashedPsw = await argon.hash(dto.password)
-            const newUser = await this.userModel.create({
-                username: dto.username,
-                password: hashedPsw,
-            })
         
+        if(dto.username === dto.password) throw new BadRequestException("Slaptazodis negali buti toks pat kaip vartotojas!")
+        const userExists = await this.userModel.findOne({username: dto.username})
+        if(userExists) throw new ForbiddenException("Toks vartotojas jau egzistuoja!")
 
-            return { username: newUser.username }
+        
+        const hashedPsw = await argon.hash(dto.password)
+        const newUser = await this.userModel.create({
+            username: dto.username,
+            password: hashedPsw,
+        })
+    
 
-        } catch (error) {
-            if(error.code === 11000){
-                throw new ForbiddenException("Toks vartotojas jau egzistuoja!")
-            }
-            console.error(error)
-            
-            throw new InternalServerErrorException("Nepavyko sukurti naujo vartotojo!")
-        }
+        return { username: newUser.username }
+
+        
     }
 
     async login(dto: AuthDto){
